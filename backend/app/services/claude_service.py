@@ -15,7 +15,8 @@ SYSTEM = (
 
 
 def _call(user_prompt: str) -> dict:
-    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+    api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+    genai.configure(api_key=api_key)
     model = genai.GenerativeModel(model_name=MODEL, system_instruction=SYSTEM)
     response = model.generate_content(user_prompt)
     raw = response.text.strip()
