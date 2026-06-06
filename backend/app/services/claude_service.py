@@ -1,11 +1,11 @@
 import os
 import json
-import google.generativeai as genai
+from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
 
-MODEL = "gemini-3.5-flash"
+MODEL = "llama-3.3-70b-versatile"
 
 SYSTEM = (
     "Você analisa copies de anúncios pagos. Fala como copywriter experiente, não como analista de dados. "
@@ -15,11 +15,16 @@ SYSTEM = (
 
 
 def _call(user_prompt: str) -> dict:
-    api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel(model_name=MODEL, system_instruction=SYSTEM)
-    response = model.generate_content(user_prompt)
-    raw = response.text.strip()
+    client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+    completion = client.chat.completions.create(
+        model=MODEL,
+        messages=[
+            {"role": "system", "content": SYSTEM},
+            {"role": "user", "content": user_prompt},
+        ],
+        temperature=0.7,
+    )
+    raw = completion.choices[0].message.content.strip()
     raw = raw.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
     return json.loads(raw)
 

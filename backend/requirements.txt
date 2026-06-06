@@ -2,6 +2,6 @@ fastapi
 uvicorn[standard]
 python-multipart
 supabase
-google-generativeai
+groq
 python-dotenv
 httpx
